@@ -10,7 +10,7 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 const corsOptions = {
-    origin: process.env.CLIENT_URL || "https://projectfrontend-one.vercel.app/",
+    origin: [process.env.CLIENT_URL, "https://projectfrontend-one.vercel.app", "http://localhost:5173"].filter(Boolean),
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     credentials: true
 }
