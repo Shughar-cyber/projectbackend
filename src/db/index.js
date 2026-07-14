@@ -9,7 +9,11 @@ const dnsServers = (process.env.DNS_SERVERS || "8.8.8.8,1.1.1.1,8.8.4.4")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean)
-dns.setServers(dnsServers)
+
+// Disable this in Vercel as it interferes with AWS Lambda's internal DNS
+if (!process.env.VERCEL) {
+    dns.setServers(dnsServers)
+}
 
 export const connectDB = async (uri, { timeoutMs = 15000 } = {}) => {
     return mongoose.connect(uri, {
