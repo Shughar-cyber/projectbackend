@@ -6,8 +6,23 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],
       trim: true,
+    },
+    username: {
+      type: String,
+      required: [true, "Username is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      minlength: [3, "Username must be at least 3 characters"],
+      maxlength: [100, "Username must be at most 100 characters"],
+    },
+    phone: {
+      type: String,
+      required: [true, "Phone number is required"],
+      unique: true,
+      trim: true,
+      match: [/^\+?[0-9\s-]{7,20}$/, "Please provide a valid phone number"],
     },
     email: {
       type: String,

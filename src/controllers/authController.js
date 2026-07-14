@@ -5,18 +5,41 @@ import { sendEmail } from "../utils/sendEmail.js";
 
 export const signup = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { username, email, password, phone, name } = req.body;
+    const finalUsername = (username || name || "").trim();
+    const finalPhone = (phone || "").trim();
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "Name, email and password are all required" });
+    if (!finalUsername || !email || !password || !finalPhone) {
+      return res.status(400).json({ message: "Username, email, password, and phone number are all required" });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({
+      $or: [
+        { email: email.toLowerCase() },
+        { username: finalUsername.toLowerCase() },
+        { phone: finalPhone },
+      ],
+    });
+
     if (existingUser) {
-      return res.status(409).json({ message: "An account with that email already exists" });
+      if (existingUser.email?.toLowerCase() === email.toLowerCase()) {
+        return res.status(409).json({ message: "An account with that email already exists" });
+      }
+      if (existingUser.username === finalUsername.toLowerCase()) {
+        return res.status(409).json({ message: "That username is already taken" });
+      }
+      if (existingUser.phone === finalPhone) {
+        return res.status(409).json({ message: "That phone number is already registered" });
+      }
     }
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({
+      name: finalUsername,
+      username: finalUsername,
+      email: email.toLowerCase(),
+      password,
+      phone: finalPhone,
+    });
 
     const verificationCode = user.createEmailVerificationCode();
     await user.save({ validateBeforeSave: false });
@@ -41,7 +64,13 @@ export const signup = async (req, res, next) => {
     }
     res.status(201).json({
       message: "Account created. Check your email for a verification code.",
-      email: user.email,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        phone: user.phone,
+        email: user.email,
+      },
     });
   } catch (error) {
     next(error);
@@ -77,6 +106,8 @@ export const login = async (req, res, next) => {
       user: {
         id: user._id,
         name: user.name,
+        username: user.username,
+        phone: user.phone,
         email: user.email,
         isVerified: user.isVerified,
         createdAt: user.createdAt,
@@ -101,6 +132,8 @@ export const getMe = async (req, res) => {
     user: {
       id: req.user._id,
       name: req.user.name,
+      username: req.user.username,
+      phone: req.user.phone,
       email: req.user.email,
       isVerified: req.user.isVerified,
       createdAt: req.user.createdAt,
@@ -247,6 +280,8 @@ export const verifyEmail = async (req, res, next) => {
       user: {
         id: user._id,
         name: user.name,
+        username: user.username,
+        phone: user.phone,
         email: user.email,
         isVerified: user.isVerified,
         createdAt: user.createdAt,
