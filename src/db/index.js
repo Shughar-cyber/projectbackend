@@ -18,7 +18,6 @@ if (!process.env.VERCEL) {
 export const connectDB = async (uri, { timeoutMs = 15000 } = {}) => {
     return mongoose.connect(uri, {
         serverSelectionTimeoutMS: timeoutMs,
-        // Prefer IPv4 — some networks resolve AAAA records that then time out.
         family: 4,
     })
 }

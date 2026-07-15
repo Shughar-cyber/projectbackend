@@ -271,7 +271,6 @@ export const verifyEmail = async (req, res, next) => {
     user.emailVerificationExpires = undefined;
     await user.save({ validateBeforeSave: false });
 
-    // Verification is complete — log them in now.
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 

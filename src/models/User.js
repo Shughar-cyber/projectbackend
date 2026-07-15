@@ -73,10 +73,10 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 userSchema.methods.createResetCode = function () {
-  const resetCode = Math.floor(100000 + Math.random() * 900000).toString(); // e.g. "483920"
+  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
 
   this.resetPasswordCode = crypto.createHash("sha256").update(resetCode).digest("hex");
-  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
 
   return resetCode;
 };
@@ -85,7 +85,7 @@ userSchema.methods.createEmailVerificationCode = function () {
   const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
   this.emailVerificationCode = crypto.createHash("sha256").update(verificationCode).digest("hex");
-  this.emailVerificationExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  this.emailVerificationExpires = Date.now() + 10 * 60 * 1000;
 
   return verificationCode;
 };
